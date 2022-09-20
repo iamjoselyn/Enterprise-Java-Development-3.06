@@ -8,26 +8,23 @@ import com.ironhack.authors.repository.authors.ArticleRepository;
 import com.ironhack.authors.repository.authors.AuthorRepository;
 import com.ironhack.authors.repository.authors.BlogPostRepository;
 import com.ironhack.authors.repository.authors.BookRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@Transactional  //si falla algo entre medias no se guarde en base de datos
-class AuthorRepositoryTest {
-
+@Transactional
+class ArticleRepositoryTest {
     @Autowired
     private AuthorRepository authorRepository;
     @Autowired
@@ -194,7 +191,7 @@ class AuthorRepositoryTest {
         authors2.add(consuelo);
         authors2.add(esperanza);
         Article inheritanceArticle6 = new Article("Java for dummies", LocalDate.of(2021, 5, 28), authors2,424L, 30L, "Java Development");
-            //Asociación bidireccional
+        //Asociación bidireccional
         felicidad.addPublication(inheritanceArticle6);
         paz.addPublication(inheritanceArticle6);
 
@@ -202,36 +199,17 @@ class AuthorRepositoryTest {
 
     }
 
-    @AfterEach
-    public void tearDown() {
-        bookRepository.deleteAll();
-        blogPostRepository.deleteAll();
-        articleRepository.deleteAll(); //este es el orden para que no se borre ante los autores
-        authorRepository.deleteAll();
-        //seguido readerRepository.deleteAll();
+    @Test
+    void findArticleBySpecialty() {
+        List<Article> articles = articleRepository.findBySpecialtyContains("ftware");
+        assertEquals(1, articles.size());
     }
 
     @Test
-    void findByAuthors_FirstNameAndAuthors_LastNameOrderByTitleAsc_successful() {
-
-        // Just for demonstrating purposes
-        List<Author> authorList = authorRepository.findAll();
-
-        assertEquals(2,
-                bookRepository.findByAuthors_FirstNameAndAuthors_LastNameOrderByTitleAsc("Esperanza","Amor").size());
-
+    void findTopFiveMostQuotedArticles() {
+        List<Article> mostQuotedArticle = articleRepository.findMostQuotedTopFiveArticles("Software Development", 30L, LocalDate.of(2021, 3, 27), PageRequest.of(0, 5));
+        assertEquals(1, mostQuotedArticle.size());
     }
-
-    @Test
-    void findByPublishingDateBetween_successful() {
-        assertEquals(1,
-                blogPostRepository.findByPublishingDateBetween(
-                        LocalDate.of(2019, 1, 23),
-                        LocalDate.of(2021, 1, 23)
-                ).size());
-
-    }
-
 
 
 }

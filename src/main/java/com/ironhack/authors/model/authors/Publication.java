@@ -3,6 +3,7 @@ package com.ironhack.authors.model.authors;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -27,6 +28,21 @@ public abstract class Publication {
 		      joinColumns={@JoinColumn(name="publicationId", referencedColumnName="id")},
 		      inverseJoinColumns={@JoinColumn(name="authorId", referencedColumnName="id")})
 	private Set<Author> authors = new HashSet<Author>();
+
+	//Tabla intermedia que se crea
+	@ManyToMany
+	@JoinTable(
+			name="PublicationReadByReaders",
+			joinColumns={@JoinColumn(name="publicationId", referencedColumnName="id")},
+			inverseJoinColumns={@JoinColumn(name="readerId", referencedColumnName="id")})
+	private Set<Reader> readers = new HashSet<Reader>();
+
+	public Publication(){}
+	public Publication(String title, LocalDate publishingDate, Set<Author> authors) {
+		this.title = title;
+		this.publishingDate = publishingDate;
+		this.authors = authors;
+	}
 
 	public Long getId() {
 		return this.id;
@@ -60,6 +76,14 @@ public abstract class Publication {
 		this.authors = authors;
 	}
 
+	public Set<Reader> getReaders() {
+		return readers;
+	}
+	public void setReaders(Set<Reader> readers) {
+		this.readers = readers;
+	}
+
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -77,9 +101,14 @@ public abstract class Publication {
 		return true;
 	}
 
-	@Override
+	/*@Override
 	public int hashCode() {
 		return 31;
+	}*/
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, version, title, publishingDate);
 	}
 
 	@Override

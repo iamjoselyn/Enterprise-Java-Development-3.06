@@ -5,84 +5,49 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Author {
+public class Author extends User{
+	//@Version indica al motor de bbdd una estrategia
+	//private int version;
+	//optimistic locking: tema interno de ingenieria
+	//pesimistic locking
+	// lock: bloqueo que hace mysql para orquestrar las transacciones de manera recurrente
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id", updatable = false, nullable = false)
-	private Long id;
-	
-	@Version
-	private int version;
-
-	private String firstName;
-
-	private String lastName;
+	private String specialty;
 
 	@ManyToMany(mappedBy="authors")
 	private List<Publication> publications = new ArrayList<Publication>();
 
-	public Long getId() {
-		return this.id;
+	public Author() {}
+
+	public Author(String firstName, String lastName, String specialty) {
+		super(firstName, lastName);
+		this.specialty = specialty;
 	}
 
-	public int getVersion() {
-		return this.version;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
+	//Gets
+	//public int getVersion() {
+		//return this.version;
+	//}
 	public List<Publication> getPublications() {
 		return publications;
 	}
-
-	public void setPublications(List<Publication> publications) {
-		this.publications = publications;
+	public String getSpecialty() {
+		return specialty;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof Author)) {
-			return false;
-		}
-		Author other = (Author) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
-				return false;
-			}
-		}
-		return true;
+	public void addPublication(Publication publication) {
+		//añade el autor a la lista de autores de la publicación
+		publication.getAuthors().add(this);
+		//añade la publicación a la lista de publicaciones del autor
+		this.publications.add(publication);
+
+		//añade un fila con los ids a la tabla intermedia
 	}
+
 
 	@Override
 	public int hashCode() {
 		return 31;
 	}
-	
-	@Override
-	public String toString() {
-		String result = getClass().getSimpleName() + " ";
-		if (firstName != null && !firstName.trim().isEmpty())
-			result += "firstName: " + firstName;
-		if (lastName != null && !lastName.trim().isEmpty())
-			result += ", lastName: " + lastName;
-		return result;
-	}
+
 }
